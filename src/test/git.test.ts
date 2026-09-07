@@ -9,7 +9,9 @@ suite("Git helpers", () => {
   let temporaryDirectory: string;
 
   setup(async () => {
-    temporaryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "git-tools-git-"));
+    temporaryDirectory = await fs.mkdtemp(
+      path.join(os.tmpdir(), "git-tools-git-"),
+    );
   });
 
   teardown(async () => {
@@ -22,7 +24,10 @@ suite("Git helpers", () => {
     await fs.mkdir(nestedDirectory, { recursive: true });
     await runGit(repoRoot, ["init"]);
 
-    assert.equal(await findRepositoryRoot(nestedDirectory), path.resolve(repoRoot));
+    assert.equal(
+      await findRepositoryRoot(nestedDirectory),
+      await fs.realpath(repoRoot),
+    );
   });
 
   test("removes a tracked file from the index while keeping it on disk", async () => {
@@ -31,7 +36,11 @@ suite("Git helpers", () => {
     const filePath = path.join(repoRoot, "secret.env");
     await fs.writeFile(filePath, "TOKEN=value\n");
     await runGit(repoRoot, ["init"]);
-    await runGit(repoRoot, ["config", "user.email", "git-tools@example.invalid"]);
+    await runGit(repoRoot, [
+      "config",
+      "user.email",
+      "git-tools@example.invalid",
+    ]);
     await runGit(repoRoot, ["config", "user.name", "Git Tools Tests"]);
     await runGit(repoRoot, ["add", "--", "secret.env"]);
     await runGit(repoRoot, ["commit", "-m", "test"]);
@@ -39,7 +48,10 @@ suite("Git helpers", () => {
     await removeFromGitIndex(repoRoot, filePath, false);
 
     assert.equal(await fs.readFile(filePath, "utf8"), "TOKEN=value\n");
-    assert.equal((await runGit(repoRoot, ["ls-files", "--", "secret.env"])).trim(), "");
+    assert.equal(
+      (await runGit(repoRoot, ["ls-files", "--", "secret.env"])).trim(),
+      "",
+    );
   });
 
   test("removes a tracked directory recursively while keeping its contents", async () => {
@@ -49,7 +61,11 @@ suite("Git helpers", () => {
     await fs.mkdir(directoryPath, { recursive: true });
     await fs.writeFile(filePath, "generated\n");
     await runGit(repoRoot, ["init"]);
-    await runGit(repoRoot, ["config", "user.email", "git-tools@example.invalid"]);
+    await runGit(repoRoot, [
+      "config",
+      "user.email",
+      "git-tools@example.invalid",
+    ]);
     await runGit(repoRoot, ["config", "user.name", "Git Tools Tests"]);
     await runGit(repoRoot, ["add", "--", "generated"]);
     await runGit(repoRoot, ["commit", "-m", "test"]);
@@ -57,13 +73,22 @@ suite("Git helpers", () => {
     await removeFromGitIndex(repoRoot, directoryPath, true);
 
     assert.equal(await fs.readFile(filePath, "utf8"), "generated\n");
-    assert.equal((await runGit(repoRoot, ["ls-files", "--", "generated"])).trim(), "");
+    assert.equal(
+      (await runGit(repoRoot, ["ls-files", "--", "generated"])).trim(),
+      "",
+    );
   });
 
   test("recognizes workspace boundaries", () => {
     const workspaceRoot = path.join(temporaryDirectory, "workspace");
-    assert.equal(isPathWithin(path.join(workspaceRoot, "src"), workspaceRoot), true);
-    assert.equal(isPathWithin(path.join(temporaryDirectory, "outside"), workspaceRoot), false);
+    assert.equal(
+      isPathWithin(path.join(workspaceRoot, "src"), workspaceRoot),
+      true,
+    );
+    assert.equal(
+      isPathWithin(path.join(temporaryDirectory, "outside"), workspaceRoot),
+      false,
+    );
   });
 });
 
