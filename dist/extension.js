@@ -166,6 +166,27 @@ async function appendGitignoreRule(gitignorePath, rule) {
   return true;
 }
 
+// src/operations.ts
+async function ensureResourceIgnored(resourcePath, isDirectory, repoRoot) {
+  const gitignorePath = await findNearestGitignore(
+    resourcePath,
+    isDirectory,
+    repoRoot
+  );
+  const rule = buildGitignoreRule(resourcePath, isDirectory, gitignorePath);
+  const added = await appendGitignoreRule(gitignorePath, rule);
+  return { gitignorePath, rule, added };
+}
+async function removeFromGitIndexAndIgnore(repoRoot, resourcePath, isDirectory) {
+  const update = await ensureResourceIgnored(
+    resourcePath,
+    isDirectory,
+    repoRoot
+  );
+  await removeFromGitIndex(repoRoot, resourcePath, isDirectory);
+  return update;
+}
+
 // src/path.ts
 var fs2 = __toESM(require("node:fs/promises"));
 var path4 = __toESM(require("node:path"));
@@ -204,7 +225,10 @@ async function resolveResourceContext(resourceUri) {
 // src/extension.ts
 function activate(context) {
   context.subscriptions.push(
-    vscode2.commands.registerCommand("git-tools.addToGitignore", (resourceUri) => addToGitignore(resourceUri)),
+    vscode2.commands.registerCommand(
+      "git-tools.addToGitignore",
+      (resourceUri) => addToGitignore(resourceUri)
+    ),
     vscode2.commands.registerCommand(
       "git-tools.removeFromGitIndex",
       (resourceUri) => removeFromGitIndex2(resourceUri)
@@ -215,12 +239,19 @@ function deactivate() {
 }
 async function addToGitignore(resourceUri) {
   try {
-    const context = await resolveResourceContext(resourceUri ?? getActiveEditorResource());
-    const gitignorePath = await findNearestGitignore(context.resourcePath, context.isDirectory, context.repoRoot);
-    const rule = buildGitignoreRule(context.resourcePath, context.isDirectory, gitignorePath);
-    const added = await appendGitignoreRule(gitignorePath, rule);
-    const relativeGitignore = vscode2.workspace.asRelativePath(gitignorePath, false);
-    const message = added ? `\u5DF2\u5C06 ${vscode2.workspace.asRelativePath(context.resourcePath, false)} \u6DFB\u52A0\u5230 ${relativeGitignore}\u3002` : `${vscode2.workspace.asRelativePath(context.resourcePath, false)} \u5DF2\u5B58\u5728\u4E8E ${relativeGitignore}\u3002`;
+    const context = await resolveResourceContext(
+      resourceUri ?? getActiveEditorResource()
+    );
+    const update = await ensureResourceIgnored(
+      context.resourcePath,
+      context.isDirectory,
+      context.repoRoot
+    );
+    const relativeGitignore = vscode2.workspace.asRelativePath(
+      update.gitignorePath,
+      false
+    );
+    const message = update.added ? `\u5DF2\u5C06 ${vscode2.workspace.asRelativePath(context.resourcePath, false)} \u6DFB\u52A0\u5230 ${relativeGitignore}\u3002` : `${vscode2.workspace.asRelativePath(context.resourcePath, false)} \u5DF2\u5B58\u5728\u4E8E ${relativeGitignore}\u3002`;
     void vscode2.window.showInformationMessage(message);
   } catch (error) {
     showOperationError("\u52A0\u5165 .gitignore", error);
@@ -228,10 +259,25 @@ async function addToGitignore(resourceUri) {
 }
 async function removeFromGitIndex2(resourceUri) {
   try {
-    const context = await resolveResourceContext(resourceUri ?? getActiveEditorResource());
-    await removeFromGitIndex(context.repoRoot, context.resourcePath, context.isDirectory);
+    const context = await resolveResourceContext(
+      resourceUri ?? getActiveEditorResource()
+    );
+    const update = await removeFromGitIndexAndIgnore(
+      context.repoRoot,
+      context.resourcePath,
+      context.isDirectory
+    );
+    const relativeResource = vscode2.workspace.asRelativePath(
+      context.resourcePath,
+      false
+    );
+    const relativeGitignore = vscode2.workspace.asRelativePath(
+      update.gitignorePath,
+      false
+    );
+    const gitignoreStatus = update.added ? `\u5DF2\u540C\u65F6\u6DFB\u52A0\u5230 ${relativeGitignore}` : `\u5FFD\u7565\u89C4\u5219\u5DF2\u5B58\u5728\u4E8E ${relativeGitignore}`;
     void vscode2.window.showInformationMessage(
-      `\u5DF2\u5C06 ${vscode2.workspace.asRelativePath(context.resourcePath, false)} \u4ECE Git \u7D22\u5F15\u79FB\u9664\uFF0C\u672C\u5730\u6587\u4EF6\u5DF2\u4FDD\u7559\u3002`
+      `\u5DF2\u5C06 ${relativeResource} \u4ECE Git \u7D22\u5F15\u79FB\u9664\uFF0C\u672C\u5730\u6587\u4EF6\u5DF2\u4FDD\u7559\uFF1B${gitignoreStatus}\u3002`
     );
   } catch (error) {
     showOperationError("\u4ECE Git \u7D22\u5F15\u79FB\u9664", error);
