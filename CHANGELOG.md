@@ -2,7 +2,8 @@
 
 All notable changes to the Git Tools extension are documented here.
 
-## [Unreleased]
+## [0.1.0] - 2026-09-07
 
-- Added Explorer actions for updating `.gitignore` and removing tracked resources from the Git index.
-- Updated the index removal action to ensure the selected resource is ignored before removing it from the index.
+- Initial release.
+- Added the Explorer action `Git Tools: Add to .gitignore`, which adds the selected file or folder to the nearest `.gitignore`.
+- Added the Explorer action `Git Tools: Remove from Git Index`, which ensures the selected resource is ignored and then runs `git rm --cached`, keeping the local content.

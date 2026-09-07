@@ -2,12 +2,27 @@
   "name": "git-tools",
   "displayName": "Git Tools",
   "description": "Git utilities for managing .gitignore entries and the Git index",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "publisher": "LastWhisper",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lastwhisper66/git-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lastwhisper66/git-tools/issues"
+  },
   "engines": {
     "vscode": "^1.136.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "git",
+    "gitignore",
+    "git index",
+    "scm"
   ],
   "activationEvents": [
     "onCommand:git-tools.addToGitignore",
