@@ -13,7 +13,7 @@ export interface ResourceContext {
 
 export async function resolveResourceContext(resourceUri: vscode.Uri): Promise<ResourceContext> {
   if (resourceUri.scheme !== "file") {
-    throw new Error("Git Tools 只支持本地文件和文件夹。");
+    throw new Error("Git Good Tools 只支持本地文件和文件夹。");
   }
 
   const workspaceFolder = vscode.workspace.getWorkspaceFolder(resourceUri);

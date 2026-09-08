@@ -9,11 +9,11 @@ import { resolveResourceContext } from "./path";
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "git-tools.addToGitignore",
+      "git-good-tools.addToGitignore",
       (resourceUri?: vscode.Uri) => addToGitignore(resourceUri),
     ),
     vscode.commands.registerCommand(
-      "git-tools.removeFromGitIndex",
+      "git-good-tools.removeFromGitIndex",
       (resourceUri?: vscode.Uri) => removeFromGitIndex(resourceUri),
     ),
   );

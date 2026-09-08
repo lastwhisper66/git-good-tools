@@ -1,16 +1,16 @@
 {
-  "name": "git-tools",
-  "displayName": "Git Tools",
+  "name": "git-good-tools",
+  "displayName": "Git Good Tools",
   "description": "Git utilities for managing .gitignore entries and the Git index",
   "version": "0.1.0",
-  "publisher": "LastWhisper",
+  "publisher": "lastwhisper",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lastwhisper66/git-tools.git"
+    "url": "https://github.com/lastwhisper66/git-good-tools.git"
   },
   "bugs": {
-    "url": "https://github.com/lastwhisper66/git-tools/issues"
+    "url": "https://github.com/lastwhisper66/git-good-tools/issues"
   },
   "engines": {
     "vscode": "^1.136.0"
@@ -24,35 +24,31 @@
     "git index",
     "scm"
   ],
-  "activationEvents": [
-    "onCommand:git-tools.addToGitignore",
-    "onCommand:git-tools.removeFromGitIndex"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "git-tools.addToGitignore",
-        "title": "Git Tools: Add to .gitignore",
-        "category": "Git Tools"
+        "command": "git-good-tools.addToGitignore",
+        "title": "Git Good Tools: Add to .gitignore",
+        "category": "Git Good Tools"
       },
       {
-        "command": "git-tools.removeFromGitIndex",
-        "title": "Git Tools: Remove from Git Index",
-        "category": "Git Tools"
+        "command": "git-good-tools.removeFromGitIndex",
+        "title": "Git Good Tools: Remove from Git Index",
+        "category": "Git Good Tools"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "git-tools.addToGitignore",
+          "command": "git-good-tools.addToGitignore",
           "when": "resourceScheme == file",
-          "group": "git-tools@1"
+          "group": "git-good-tools@1"
         },
         {
-          "command": "git-tools.removeFromGitIndex",
+          "command": "git-good-tools.removeFromGitIndex",
           "when": "resourceScheme == file",
-          "group": "git-tools@2"
+          "group": "git-good-tools@2"
         }
       ]
     }
